@@ -1,6 +1,8 @@
 # EDGARScrape
 Data Engineering project to use SQLAlchemy for writing scraped data to Postgres in a Docker container.
 
+<img width="556" alt="image" src="https://user-images.githubusercontent.com/58488209/137550226-ba031fcc-c5b9-4e34-8912-43521186771e.png">
+
 # Environment Setup
 ## Postgres in Docker
 ### Pull Postgres Image
