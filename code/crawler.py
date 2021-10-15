@@ -94,7 +94,7 @@ class Crawler:
         
         self.facts['sharesOutstanding'] = self._extract_from_data("facts.dei.EntityCommonStockSharesOutstanding.units.shares")
         self.facts['usGaap'] = self._extract_from_data("facts.us-gaap")
-        print(self.facts)
+        # print(self.facts)
 
         
 
