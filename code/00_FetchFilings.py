@@ -13,4 +13,7 @@ spider.populate_facts()
 subset = {k: v for k, v in spider.facts['usGaap'].items() if k in crawler.keys_to_extract}
 
 #%%
-pd.DataFrame(subset['EarningsPerShareDiluted']['units']['USD'])[['end', 'val']].rolling(4).mean().plot()
+pd.DataFrame(subset['EarningsPerShareDiluted']['units']['USD'])
+
+#%%
+pd.DataFrame(subset['AssetsCurrent']['units']['USD'])
