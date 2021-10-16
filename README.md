@@ -9,12 +9,12 @@ Data Engineering project to use SQLAlchemy for writing scraped data to Postgres 
 
 ## Environment Setup
 ### Pull Postgres Image
-```bash
+```console
 docker pull postgres:latest
 ```
 
 ### Run Container
-```bash
+```console
 docker run --name edgar-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
 
 
@@ -23,7 +23,7 @@ make run
 ```
 
 ### To manually connect with `psql`
-```bash
+```console
 docker exec -it edgar-postgres /bin/bash
 psql postgresql://postgres:mysecretpassword@localhost:5432
 
