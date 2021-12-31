@@ -1,4 +1,3 @@
-from sqlalchemy.orm.session import SessionTransaction
 from crawler import Crawler
 from sqlalchemy.orm import backref, relation, sessionmaker, relationship
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float

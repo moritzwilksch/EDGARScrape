@@ -1,6 +1,5 @@
 # %%
 
-from nbformat import current_nbformat
 import requests
 
 with open("data/usGaapKeys.txt", "r") as f:
