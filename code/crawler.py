@@ -59,7 +59,10 @@ class Crawler:
         self.url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{self.cik}.json"
 
         self.headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64)",
+            # "User-Agent": "Mozilla/5.0 (X11; Linux x86_64)",
+            # "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/43.4",
+            "User-Agent": "Duke University info@duke.edu www.duke.edu",
+            "Accept-Encoding": "gzip, deflate",
         }
 
         self.facts = dict()
