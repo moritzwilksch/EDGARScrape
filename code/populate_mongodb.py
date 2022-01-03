@@ -1,12 +1,21 @@
 from crawler import Crawler
 from pymongo import MongoClient
-import pymongo
+import os
 
-client = MongoClient("localhost", 27017)
+mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
+mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
+
+print(f"USER:{mongo_user} & PASS:{mongo_pass}")
+
+# authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
+client = MongoClient(
+    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
+)
 db = client["edgar"]
 collection = db["facts"]
 
 print("Initialized.")
+
 
 class CrawlerToMongoAdapter:
     def __init__(self, crawler: Crawler, collection) -> None:
@@ -15,7 +24,7 @@ class CrawlerToMongoAdapter:
 
         # load existing facts
         self.existing_facts = set()
-        for x in self.collection.find({'company_name': 1, 'name': 1, 'period': 1}):
+        for x in self.collection.find({"company_name": 1, "name": 1, "period": 1}):
             self.existing_facts.add(f"{x['company_name']}_{x['name']}_{x['period']}")
 
     def populate_database(self):
@@ -48,6 +57,7 @@ class CrawlerToMongoAdapter:
                 )
 
         self.collection.insert_many(facts)
+
 
 if __name__ == "__main__":
     spider = Crawler("0001318605")
