@@ -11,23 +11,27 @@ Documentation for EDGAR API can be found [here](https://www.sec.gov/edgar/sec-ap
 ## Environment Setup
 ### Pull Postgres Image
 ```console
-docker pull postgres:latest
+docker pull mongo
+```
+
+### Set up Mongo User and Password in `.env` File
+```bash
+# .env
+MONGO_INITDB_ROOT_USERNAME=<username>
+MONGO_INITDB_ROOT_PASSWORD=<password>
 ```
 
 ### Run Container
 ```console
-docker run --name edgar-postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
-
+docker run -d --name edgar-mongo --env-file .env -p 27017:27017 mongo
 
 # OR:
-make run
+make run-mongo
 ```
 
-### To manually connect with `psql`
+### To manually connect with `mongosh`
 ```console
-docker exec -it edgar-postgres /bin/bash
-psql postgresql://postgres:mysecretpassword@localhost:5432
+docker exec -it edgar-mongo bash
 
-# OR:
-make psql
+mongosh
 ```
