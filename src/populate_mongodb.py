@@ -2,20 +2,6 @@ from crawler import Crawler
 from pymongo import MongoClient
 import os
 
-mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
-mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
-
-print(f"USER:{mongo_user} & PASS:{mongo_pass}")
-
-# authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-)
-db = client["edgar"]
-collection = db["facts"]
-
-print("Initialized.")
-
 
 class CrawlerToMongoAdapter:
     def __init__(self, crawler: Crawler, collection) -> None:
@@ -60,6 +46,18 @@ class CrawlerToMongoAdapter:
 
 
 if __name__ == "__main__":
+    # DB INIT
+    mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
+    mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
+
+    client = MongoClient(
+        f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
+        # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
+    )
+    db = client["edgar"]
+    collection = db["facts"]
+
+    # CRAWL
     spider = Crawler("0001318605")
     spider.populate_facts()
     adapter = CrawlerToMongoAdapter(spider, collection)
