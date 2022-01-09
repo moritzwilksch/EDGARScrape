@@ -1,3 +1,6 @@
+install:
+	pip install -r requirements.txt
+
 run-postgres:
 	docker run --name edgar-postgres \
 		-e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
