@@ -13,9 +13,15 @@ class CIKTickerPopulator:
     def __init__(self, collection=None):
         self.collection = collection
 
+        # load all existing ciks in memory to only add the new ones
+        self.existing_ciks = set()
+        for x in self.collection.find({}, {"cik": 1}):
+            self.existing_ciks.add(x["cik"])
+
     def populate_database(self):
         # fetch mapping from SEC
         response = requests.get("https://www.sec.gov/files/company_tickers.json")
+
         mappings = []
         for triple in response.json().values():
             cik_str, ticker, title = (
@@ -23,13 +29,20 @@ class CIKTickerPopulator:
                 triple.get("ticker"),
                 triple.get("title"),
             )
+
+            # only add new CIKs
+            if cik_str in self.existing_ciks:
+                continue
+
             mappings.append(
                 {"cik": int(cik_str), "ticker": ticker, "title": title,}
             )
 
         # update mongo
-        self.collection.insert_many(mappings)
-        print(response.json())
+        print(f"Adding {len(mappings)} mappings.")
+
+        if mappings:
+            self.collection.insert_many(mappings)
 
 
 if __name__ == "__main__":
