@@ -24,7 +24,7 @@ class CrawlerToMongoAdapter:
                 if (
                     f"{self.crawler.company_name}_{fact_name}_{period}"
                     in self.existing_facts
-                ):
+                ) or "frame" not in period:  # only the important periods contain the "frame" key
                     continue
 
                 # create fact
@@ -32,7 +32,7 @@ class CrawlerToMongoAdapter:
                     # company_name=self.crawler.company_name,  # TODO: Is the full name necessary?
                     ticker=ticker,
                     name=fact_name,
-                    period=f"{period['fp']}{period['fy']}",
+                    period=period.get("frame"),
                     value=period["val"],
                     unit=unit,  # actual unit, e.g. USD
                 )
@@ -60,10 +60,10 @@ if __name__ == "__main__":
     collection = db["facts"]
 
     TICKER = "MPW"
-    for TICKER in ["AAPL", "TSLA", "MPW", "JPM"]:
-        query_result = db['ciks'].find_one({"ticker": {"$eq": TICKER}})
+    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+        query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
-            cik = str(query_result['cik']).zfill(10)
+            cik = str(query_result["cik"]).zfill(10)
         else:
             raise ValueError(f"Ticker {TICKER} not found in DB")
 
