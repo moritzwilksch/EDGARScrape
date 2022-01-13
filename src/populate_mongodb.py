@@ -13,7 +13,8 @@ class CrawlerToMongoAdapter:
         for x in self.collection.find({"company_name": 1, "name": 1, "period": 1}):
             self.existing_facts.add(f"{x['company_name']}_{x['name']}_{x['period']}")
 
-    def populate_database(self):
+    def populate_database(self, ticker: str):
+        """ Populate databse from fields of crawler. Ticker is injected to be queried later. """
         facts = []
         for fact_name in self.crawler.facts:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
@@ -28,7 +29,8 @@ class CrawlerToMongoAdapter:
 
                 # create fact
                 fact = dict(
-                    company_name=self.crawler.company_name,
+                    # company_name=self.crawler.company_name,  # TODO: Is the full name necessary?
+                    ticker=ticker,
                     name=fact_name,
                     period=f"{period['fp']}{period['fy']}",
                     value=period["val"],
@@ -57,9 +59,16 @@ if __name__ == "__main__":
     db = client["edgar"]
     collection = db["facts"]
 
+    TICKER = "MPW"
+    query_result = db['ciks'].find_one({"ticker": {"$eq": TICKER}})
+    if query_result is not None:
+        cik = str(query_result['cik']).zfill(10)
+    else:
+        raise ValueError(f"Ticker {TICKER} not found in DB")
+
     # CRAWL
-    spider = Crawler("0001318605")
+    spider = Crawler(cik)  # 0001318605 = Tesla
     spider.populate_facts()
     adapter = CrawlerToMongoAdapter(spider, collection)
-    adapter.populate_database()
+    adapter.populate_database(TICKER)
     print("done")

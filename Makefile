@@ -14,7 +14,4 @@ psql:
 	docker exec -it edgar-postgres /bin/bash
 
 run-mongo:
-	docker run -d --name edgar-mongo --env-file .env -p 27017:27017 mongo
-
-loadvars:
-	source .env
+	docker run -d --name edgar-mongo --env-file .env -v `pwd`/db:/data/db -p 27017:27017 mongo
