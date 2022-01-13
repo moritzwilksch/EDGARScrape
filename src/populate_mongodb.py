@@ -60,15 +60,18 @@ if __name__ == "__main__":
     collection = db["facts"]
 
     TICKER = "MPW"
-    query_result = db['ciks'].find_one({"ticker": {"$eq": TICKER}})
-    if query_result is not None:
-        cik = str(query_result['cik']).zfill(10)
-    else:
-        raise ValueError(f"Ticker {TICKER} not found in DB")
+    for TICKER in ["AAPL", "TSLA", "MPW", "JPM"]:
+        query_result = db['ciks'].find_one({"ticker": {"$eq": TICKER}})
+        if query_result is not None:
+            cik = str(query_result['cik']).zfill(10)
+        else:
+            raise ValueError(f"Ticker {TICKER} not found in DB")
 
-    # CRAWL
-    spider = Crawler(cik)  # 0001318605 = Tesla
-    spider.populate_facts()
-    adapter = CrawlerToMongoAdapter(spider, collection)
-    adapter.populate_database(TICKER)
+        # CRAWL
+        spider = Crawler(cik)  # 0001318605 = Tesla
+        spider.populate_facts()
+        adapter = CrawlerToMongoAdapter(spider, collection)
+        adapter.populate_database(TICKER)
+
+        # TODO: DB contains duplicate entries for the same fact
     print("done")
