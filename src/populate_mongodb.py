@@ -73,5 +73,4 @@ if __name__ == "__main__":
         adapter = CrawlerToMongoAdapter(spider, collection)
         adapter.populate_database(TICKER)
 
-        # TODO: DB contains duplicate entries for the same fact
     print("done")
