@@ -1,4 +1,5 @@
 #%%
+from unicodedata import category
 from pymongo import MongoClient
 import os
 import pandas as pd
@@ -14,18 +15,51 @@ db = client["edgar"]
 collection = db["facts"]
 
 #%%
-res = collection.aggregate(
+# res = collection.aggregate(
+#     [
+#         {"$match": {"name": "AccountsPayableCurrent"}},
+#         {"$group": {"_id": "$ticker", "count": {"$sum": 1}}},
+#     ]
+# )
+
+#%%
+
+#%%
+import polars as pl
+
+data = collection.find(
+    {"ticker": {"$in": ["AAPL", "JPM", "F"]}},
+    {"ticker": 1, "name": 1, "period": 1, "_id": 0},
+)
+
+#%%
+
+df = pl.from_records(list(data)).with_columns(
     [
-        {"$match": {"name": "AccountsPayableCurrent"}},
-        {"$group": {"_id": "$ticker", "count": {"$sum": 1}}},
+        pl.col("ticker").cast(pl.Categorical),
+        pl.col("name").cast(pl.Categorical),
+        # pl.col("period").cast(pl.Categorical),
     ]
 )
 
 #%%
-from rich.console import Console
+low_occurence_facts = (
+    df.groupby(["ticker", "name"])
+    .agg({"period": "count"})
+    .sort("period_count")
+    .groupby("ticker")
+    .apply(lambda g: g[:10])
+)
 
-print = Console().print
+#%%
+print(df.groupby("name").agg({"period": ["min", "max"]}))
+
+#%%
+res = collection.aggregate(
+    [{"$group": {"_id": ["$ticker", "$name"], "size": {"$count": {}}}}]
+)
 
 #%%
 for x in res:
     print(x)
+    break
