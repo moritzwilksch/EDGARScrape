@@ -23,9 +23,9 @@ class Metric:
         self.value = None
 
     def __repr__(self) -> str:
-        obj_representation = f"METRIC({self.name}, {self.ticker}, {self.period}, {self.value})"
+        obj_representation = f"Metric({self.name}, {self.ticker}, {self.period}, {self.value})"
         requires_representation = f"requires: {self.raw_fields_needed}"
-        return f"{obj_representation}{requires_representation:.>80}"
+        return f"{obj_representation} --> {requires_representation}"
 
     def __str__(self):
         return self.__repr__()
