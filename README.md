@@ -1,6 +1,9 @@
 # EDGARScrape 🕷
 >A data engineering project to collect fundamental financial data from the SEC EDGAR database and calculate relevant metrics for performing peer group comparisons.
 
+## Architecture
+TODO: Folder structure
+
 ## Environment Setup
 ### Pull Postgres Image
 ```console
