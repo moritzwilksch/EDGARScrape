@@ -1,6 +1,9 @@
 from crawler import Crawler
 from pymongo import MongoClient
 import os
+from rich.console import Console
+
+c = Console()
 
 
 class CrawlerToMongoAdapter:
@@ -8,10 +11,11 @@ class CrawlerToMongoAdapter:
         self.crawler = crawler
         self.collection = collection
 
-        # load existing facts
-        # self.existing_facts = set()
-        # for x in self.collection.find({"company_name": 1, "name": 1, "period": 1}):
-        #     self.existing_facts.add(f"{x['company_name']}_{x['name']}_{x['period']}")
+        # load existing facts. they are stored as ticker_factname strings in a set
+        # e.g. "AAPL_Revenues"
+        self.existing_facts = set()
+        for x in self.collection.find({}, {"ticker": 1, "name": 1}):
+            self.existing_facts.add(f"{x['ticker']}_{x['name']}")
 
     def populate_database(self, ticker: str):
         """Populate databse from fields of crawler. Ticker is injected to be queried later."""
@@ -20,29 +24,31 @@ class CrawlerToMongoAdapter:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
             fact_list = self.crawler.facts[fact_name]["units"][unit]
 
+            # only put facts with "frame" in values array as these are the yearly stats
+            fact_list = [f for f in fact_list if f.get("frame", None)]
+
             # if fact exists, do not re-create it
-            # if (
-            #     f"{self.crawler.company_name}_{fact_name}_{period}"
-            #     in self.existing_facts
-            # ) or "frame" not in period:  # only the important periods contain the "frame" key
-            #     continue
+            if f"{ticker}_{fact_name}" in self.existing_facts:
+                continue
 
             # create fact
             fact = dict(
                 # company_name=self.crawler.company_name,  # TODO: Is the full name necessary?
                 ticker=ticker,
                 name=fact_name,
-                # period=period.get("frame"),
-                values=fact_list,  # period["val"],
+                values=fact_list,
                 unit=unit,  # actual unit, e.g. USD
             )
 
             facts.append(fact)
 
             # update existing facts
-            # self.existing_facts.add(f"{self.crawler.company_name}_{fact_name}_{period}")
+            self.existing_facts.add(f"{ticker}_{fact_name}")
 
-        self.collection.insert_many(facts)
+        if facts:
+            self.collection.insert_many(facts)
+        else:
+            c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
 
 
 if __name__ == "__main__":
@@ -58,7 +64,7 @@ if __name__ == "__main__":
     collection = db["facts"]
 
     TICKER = "MPW"
-    for TICKER in ["MPW"]:  # ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
         query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
@@ -71,4 +77,4 @@ if __name__ == "__main__":
         adapter = CrawlerToMongoAdapter(spider, collection)
         adapter.populate_database(TICKER)
 
-    print("done")
+    c.print("Database population done.", style="green")
