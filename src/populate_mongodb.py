@@ -9,40 +9,38 @@ class CrawlerToMongoAdapter:
         self.collection = collection
 
         # load existing facts
-        self.existing_facts = set()
-        for x in self.collection.find({"company_name": 1, "name": 1, "period": 1}):
-            self.existing_facts.add(f"{x['company_name']}_{x['name']}_{x['period']}")
+        # self.existing_facts = set()
+        # for x in self.collection.find({"company_name": 1, "name": 1, "period": 1}):
+        #     self.existing_facts.add(f"{x['company_name']}_{x['name']}_{x['period']}")
 
     def populate_database(self, ticker: str):
-        """ Populate databse from fields of crawler. Ticker is injected to be queried later. """
+        """Populate databse from fields of crawler. Ticker is injected to be queried later."""
         facts = []
         for fact_name in self.crawler.facts:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
-            for period in self.crawler.facts[fact_name]["units"][unit]:
+            fact_list = self.crawler.facts[fact_name]["units"][unit]
 
-                # if fact exists, do not re-create it
-                if (
-                    f"{self.crawler.company_name}_{fact_name}_{period}"
-                    in self.existing_facts
-                ) or "frame" not in period:  # only the important periods contain the "frame" key
-                    continue
+            # if fact exists, do not re-create it
+            # if (
+            #     f"{self.crawler.company_name}_{fact_name}_{period}"
+            #     in self.existing_facts
+            # ) or "frame" not in period:  # only the important periods contain the "frame" key
+            #     continue
 
-                # create fact
-                fact = dict(
-                    # company_name=self.crawler.company_name,  # TODO: Is the full name necessary?
-                    ticker=ticker,
-                    name=fact_name,
-                    period=period.get("frame"),
-                    value=period["val"],
-                    unit=unit,  # actual unit, e.g. USD
-                )
+            # create fact
+            fact = dict(
+                # company_name=self.crawler.company_name,  # TODO: Is the full name necessary?
+                ticker=ticker,
+                name=fact_name,
+                # period=period.get("frame"),
+                values=fact_list,  # period["val"],
+                unit=unit,  # actual unit, e.g. USD
+            )
 
-                facts.append(fact)
+            facts.append(fact)
 
-                # update existing facts
-                self.existing_facts.add(
-                    f"{self.crawler.company_name}_{fact_name}_{period}"
-                )
+            # update existing facts
+            # self.existing_facts.add(f"{self.crawler.company_name}_{fact_name}_{period}")
 
         self.collection.insert_many(facts)
 
@@ -60,7 +58,7 @@ if __name__ == "__main__":
     collection = db["facts"]
 
     TICKER = "MPW"
-    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+    for TICKER in ["MPW"]:  # ["AAPL", "TSLA", "MPW", "JPM", "F"]:
         query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
