@@ -44,7 +44,8 @@ class CrawlerToMongoAdapter:
 
             # update existing facts
             self.existing_facts.add(f"{ticker}_{fact_name}")
-
+        
+        # TODO: merge aliased fields
         if facts:
             self.collection.insert_many(facts)
         else:

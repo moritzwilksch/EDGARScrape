@@ -1,8 +1,8 @@
 from pymongo import MongoClient
 import os
 from rich.console import Console
-
-print = Console().print
+from rich.table import Table
+c = Console()
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
@@ -14,7 +14,7 @@ db = client["edgar"]
 collection = db["facts"]
 
 res_gross: list[dict] = collection.find(
-    {"ticker": "AAPL", "name": "GrossProfit"}, {"values": 1, "_id": 0}
+    {"ticker": "AAPL", "name": "SalesRevenueNet"}, {"values": 1, "_id": 0}
 ).next()["values"]
 res_net: list[dict] = collection.find(
     {"ticker": "AAPL", "name": "NetIncomeLoss"}, {"values": 1, "_id": 0}
@@ -40,5 +40,11 @@ for period in overlap:
     metrics.append((period, metric))
 
 metrics = sorted(metrics, key=lambda x: x[0])
+table = Table(title="Metric over Time")
+table.add_column("Period", justify="center")
+table.add_column("Value", justify="center")
+
 for t in metrics:
-    print(f"Period: {t[0]:<8}: Metric: {t[1]}")
+    table.add_row(f"{t[0]}", f"{t[1]:.5f}")
+c.clear()
+c.print(table)
