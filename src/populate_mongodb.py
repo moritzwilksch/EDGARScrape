@@ -20,7 +20,7 @@ class CrawlerToMongoAdapter:
 
     def populate_database(self, ticker: str):
         """Populate databse from fields of crawler. Ticker is injected to be queried later."""
-        facts = []
+        facts_for_db = dict()
         for fact_name in self.crawler.facts:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
             fact_list = self.crawler.facts[fact_name]["units"][unit]
@@ -41,17 +41,17 @@ class CrawlerToMongoAdapter:
                 unit=unit,  # actual unit, e.g. USD
             )
 
-            facts.append(fact)
+            facts_for_db[fact_name] = fact
 
             # update existing facts
             self.existing_facts.add(f"{ticker}_{fact_name}")
         
         # TODO: merge aliased fields
         for alias, actual_field_name in FIELD_ALIASES.items():
-            pass
+            pass  # TODO: implement
 
-        if facts:
-            self.collection.insert_many(facts)
+        if facts_for_db:
+            self.collection.insert_many(facts_for_db)
         else:
             c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
 
