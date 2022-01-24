@@ -27,7 +27,7 @@ def scrape_one_ticker(
     meta_collection: pymongo.collection.Collection,
 ):
     """ Scrape one ticker and populate DB. Logs to `scrape_meta` collection"""
-    metadata = {"ticker": ticker, "status": "pending", "msg": None}
+    metadata = {"ticker": ticker, "status": "pending"}  # optional: msg field with error message
     c.print(f"Scraping {ticker}...")
     try:
         # CRAWL

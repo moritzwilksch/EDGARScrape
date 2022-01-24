@@ -2,6 +2,7 @@ from crawler import Crawler
 from pymongo import MongoClient
 import os
 from rich.console import Console
+from field_aliases import FIELD_ALIASES
 
 c = Console()
 
@@ -46,6 +47,9 @@ class CrawlerToMongoAdapter:
             self.existing_facts.add(f"{ticker}_{fact_name}")
         
         # TODO: merge aliased fields
+        for alias, actual_field_name in FIELD_ALIASES.items():
+            pass
+
         if facts:
             self.collection.insert_many(facts)
         else:
