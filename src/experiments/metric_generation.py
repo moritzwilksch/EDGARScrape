@@ -14,6 +14,6 @@ if __name__ == "__main__":
     )
     db = client["edgar"]
     collection = db["facts"]
-    metric1 = RevenueProfitMargin("RevenueProfitMargin", "AAPL", "CY2016", ["Revenues", "GrossProfit"], db)
+    metric1 = RevenueProfitMargin("RevenueProfitMargin", "AAPL", ["Revenues", "GrossProfit"], db)
     metric1.calculate()
     c.print(metric1)
