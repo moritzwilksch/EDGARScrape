@@ -20,15 +20,16 @@ class CrawlerToMongoAdapter:
 
     def populate_database(self, ticker: str):
         """Populate databse from fields of crawler. Ticker is injected to be queried later."""
-        facts = []
+        facts_for_db = dict()
         for fact_name in self.crawler.facts:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
             fact_list = self.crawler.facts[fact_name]["units"][unit]
 
             # only put facts with "frame" in values array as these are the yearly stats
             fact_list = [f for f in fact_list if f.get("frame", None)]
+            fact_list.sort(key=lambda x: x["frame"])
 
-            # if fact exists, do not re-create it
+            # if fact exists do not re-create it
             if f"{ticker}_{fact_name}" in self.existing_facts:
                 continue
 
@@ -41,17 +42,22 @@ class CrawlerToMongoAdapter:
                 unit=unit,  # actual unit, e.g. USD
             )
 
-            facts.append(fact)
+            facts_for_db[fact_name] = fact
 
             # update existing facts
             self.existing_facts.add(f"{ticker}_{fact_name}")
-        
-        # TODO: merge aliased fields
-        for alias, actual_field_name in FIELD_ALIASES.items():
-            pass
 
-        if facts:
-            self.collection.insert_many(facts)
+        # handle aliases: merge all facts with strange names into the "values" field of the real fact
+        for alias, final_field_name in FIELD_ALIASES.items():
+            values_of_alias = facts_for_db[alias].get("values", [])
+            facts_for_db[final_field_name]["values"].extend(values_of_alias)
+            facts_for_db[final_field_name]["values"].sort(key=lambda x: x["frame"])
+            del facts_for_db[
+                alias
+            ]  # do not insert the facts with weird name: duplicates!
+
+        if facts_for_db:
+            self.collection.insert_many(list(facts_for_db.values()))
         else:
             c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
 
@@ -69,7 +75,7 @@ if __name__ == "__main__":
     collection = db["facts"]
 
     TICKER = "MPW"
-    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+    for TICKER in ["AAPL"]:  # ["AAPL", "TSLA", "MPW", "JPM", "F"]:
         query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
