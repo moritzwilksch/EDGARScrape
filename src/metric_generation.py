@@ -1,8 +1,9 @@
 from pymongo.database import Database
 import os
 from pymongo import MongoClient
-from metric_definition import RevenueProfitMargin
+from metric_definition import RevenueProfitMargin, AdsToRevenue
 from rich.console import Console
+
 c = Console()
 
 if __name__ == "__main__":
@@ -14,6 +15,10 @@ if __name__ == "__main__":
     )
     db = client["edgar"]
     collection = db["facts"]
-    metric1 = RevenueProfitMargin("RevenueProfitMargin", "AAPL", ["Revenues", "GrossProfit"], db)
-    metric1.calculate()
+    metric1 = RevenueProfitMargin("AAPL", db)
+    metric1.populate()
     c.print(metric1)
+
+    metric2 = AdsToRevenue("AAPL", db)
+    metric2.populate()
+    c.print(metric2)

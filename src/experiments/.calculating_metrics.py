@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import os
 from rich.console import Console
 from rich.table import Table
+
 c = Console()
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")

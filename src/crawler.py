@@ -95,4 +95,3 @@ class Crawler:
 if __name__ == "__main__":
     spider = Crawler("0001318605")
     spider.populate_facts()
-

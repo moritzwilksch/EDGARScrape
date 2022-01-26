@@ -39,9 +39,7 @@ class Fact(Base):
     period_rel = relationship("Period", back_populates="facts_rel")
 
     def __repr__(self) -> str:
-        return (
-            f"[{self.company_name}] {self.name} {self.period} = {self.value} {self.unit}"
-        )
+        return f"[{self.company_name}] {self.name} {self.period} = {self.value} {self.unit}"
 
 
 Base.metadata.drop_all(bind=engine)
@@ -94,7 +92,6 @@ class CrawlerToDatabaseAdapter:
                     unit=unit,  # actual unit, e.g. USD
                 )
 
-
                 facts.append(fact)
 
                 # update existing facts
@@ -113,4 +110,3 @@ for x in session.query(Fact):
     print(x)
 
 print("done")
-

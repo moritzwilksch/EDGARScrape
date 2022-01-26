@@ -15,6 +15,7 @@ collection = db["compute_tasks"]
 collection.drop()
 collection.insert_one({"ticker": "TSLA", "visited": 0})
 
+
 def increment_by_ten():
     for i in range(100):
         collection.update_one({"ticker": "TSLA"}, {"$inc": {"visited": 1}})
