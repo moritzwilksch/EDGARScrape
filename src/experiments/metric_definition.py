@@ -2,7 +2,7 @@ from pymongo.database import Database
 import os
 from pymongo import MongoClient
 
-
+# ------------------------------ GENERIC PARENT CLASS -------------------------------------
 class Metric:
     FACTS_COLLECTION = "facts"
     METRICS_COLLECTION = "metrics"
@@ -34,6 +34,20 @@ class Metric:
 
         return facts
 
+    def calculate(self):
+        # Blueprint:
+        # 1. Pull data from DB:         self.pull_facts_from_db("factname1", "factname2", ...)
+        # 2. Find period overlap:       self.get_values_period_overlap([v1, v2, v3])
+        # 3. Calculate metric
+        raise NotImplementedError
+
+    def get_values_period_overlap(self, facts_dict: dict[str, dict]):
+        """ Returns the intersection of the periods of all values in the list. """
+        period_intersection = []
+        for periods in facts_dict.values():
+            period_intersection.append(set(period for period in periods))
+        return set.intersection(*period_intersection)
+
     def pull_facts_from_db(self, *fact_names) -> dict[str, dict]:
         """ Returns mapping fact_name -> {period: value, ...} """
         facts = self._pull_data_from_db()
@@ -47,20 +61,8 @@ class Metric:
 
         return facts_to_return
 
-    def get_values_period_overlap(self, facts_dict: dict[str, dict]):
-        """ Returns the intersection of the periods of all values in the list. """
-        period_intersection = []
-        for periods in facts_dict.values():
-            period_intersection.append(set(period for period in periods))
-        return set.intersection(*period_intersection)
 
-    def calculate(self):
-        # Blueprint:
-        # 1. Pull data from DB:         self._pull_data_from_db()
-        # 2. Pull out required fields:  facts[FIELD_NAME]["values"]
-        # 3. Find period overlap:       self.get_values_period_overlap([v1, v2, v3])
-        # 4. Calculate metric
-        raise NotImplementedError
+# ------------------------------- SPECIFIC METRICS ------------------------------------
 
 
 class RevenueProfitMargin(Metric):
