@@ -15,6 +15,7 @@ class Metric:
         self.raw_fields_needed = raw_fields_needed
         self.database = database
         self.values = dict()
+        self.is_populated = False
 
     def __repr__(self) -> str:
         obj_representation = f"Metric({self.name}, {self.ticker})"
@@ -86,6 +87,17 @@ class Metric:
                 self.values[period] = None
             except ZeroDivisionError:
                 self.values[period] = 0.0
+
+        if self.values:
+            self.is_populated = True
+
+    def write_to_db(self):
+        """ Writes self.values to the database. """
+        # TODO: Test whether this works
+        if not self.is_populated:
+            raise ValueError("Metric must be populated before writing to database.")
+        document = {"ticker": self.ticker, "name": self.name, "values": self.values}
+        self.database[Metric.METRICS_COLLECTION].insert_one(document)
 
 
 # ------------------------------- SPECIFIC METRICS ------------------------------------
