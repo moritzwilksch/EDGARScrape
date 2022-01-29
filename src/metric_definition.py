@@ -93,7 +93,6 @@ class Metric:
 
     def write_to_db(self):
         """ Writes self.values to the database. """
-        # TODO: Test whether this works
         if not self.is_populated:
             raise ValueError("Metric must be populated before writing to database.")
         key = {"ticker": self.ticker, "name": self.name}
