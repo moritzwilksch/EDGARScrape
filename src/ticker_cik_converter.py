@@ -42,7 +42,7 @@ class CIKTickerPopulator:
         print(f"Adding {len(mappings)} mappings.")
 
         if mappings:
-            self.collection.insert_many(mappings)
+            self.collection.insert_many(mappings)  # TODO: refactor to update w/ upsert??
 
 
 if __name__ == "__main__":

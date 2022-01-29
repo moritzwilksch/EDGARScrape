@@ -96,8 +96,10 @@ class Metric:
         # TODO: Test whether this works
         if not self.is_populated:
             raise ValueError("Metric must be populated before writing to database.")
-        document = {"ticker": self.ticker, "name": self.name, "values": self.values}
-        self.database[Metric.METRICS_COLLECTION].insert_one(document)
+        key = {"ticker": self.ticker, "name": self.name}
+        self.database[Metric.METRICS_COLLECTION].update_one(
+            key, {"$set": {"values": self.values}}, upsert=True
+        )
 
 
 # ------------------------------- SPECIFIC METRICS ------------------------------------

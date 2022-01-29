@@ -52,7 +52,7 @@ def scrape_one_ticker(
         c.print(f"{ticker:<5} -> Unkown error", style="red")
 
     finally:
-        meta_collection.insert_one(metadata)
+        meta_collection.insert_one(metadata) 
 
     time.sleep(0.75)
 

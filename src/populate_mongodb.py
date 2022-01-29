@@ -57,7 +57,7 @@ class CrawlerToMongoAdapter:
             ]  # do not insert the facts with weird name: duplicates!
 
         if facts_for_db:
-            self.collection.insert_many(list(facts_for_db.values()))
+            self.collection.insert_many(list(facts_for_db.values()))  # TODO: refactor to update w/ upsert
         else:
             c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
 
