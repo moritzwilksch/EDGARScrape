@@ -3,6 +3,7 @@ from pymongo import MongoClient
 import os
 from rich.console import Console
 from field_aliases import FIELD_ALIASES
+import time
 
 c = Console()
 
@@ -20,7 +21,7 @@ class CrawlerToMongoAdapter:
 
     def populate_database(self, ticker: str):
         """Populate databse from fields of crawler. Ticker is injected to be queried later."""
-        facts_for_db = dict()
+        facts_for_db: dict[str, dict] = dict()  # maps fact_name -> dict of fact details
         for fact_name in self.crawler.facts:
             unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
             fact_list = self.crawler.facts[fact_name]["units"][unit]
@@ -49,18 +50,29 @@ class CrawlerToMongoAdapter:
 
         # handle aliases: merge all facts with strange names into the "values" field of the real fact
         for alias, final_field_name in FIELD_ALIASES.items():
-            values_of_alias = facts_for_db[alias].get("values", [])
+            try:
+                values_of_alias = facts_for_db[alias].get("values", [])
+            except KeyError:
+                print(f"[WARN] No fact with name {alias} found.")
+                continue
+
             facts_for_db[final_field_name]["values"].extend(values_of_alias)
             facts_for_db[final_field_name]["values"].sort(key=lambda x: x["frame"])
             del facts_for_db[
                 alias
             ]  # do not insert the facts with weird name: duplicates!
 
-        if facts_for_db:
-            self.collection.insert_many(list(facts_for_db.values()))  # TODO: refactor to update w/ upsert
+        tic = time.perf_counter()
+        if facts_for_db:  # upsert is 10x as expensive!
+            self.collection.insert_many(list(facts_for_db.values()))
+            # for fact in facts_for_db.values():
+            #     key = {"ticker": fact["ticker"], "name": fact["name"]}
+            #     data = {"values": fact["values"], "unit": fact["unit"]}
+            #     self.collection.update_one(key, {"$set": data}, upsert=True)
         else:
             c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
-
+        tac = time.perf_counter()
+        print(f"Took {tac - tic} seconds.")
 
 if __name__ == "__main__":
     # DB INIT
@@ -72,10 +84,11 @@ if __name__ == "__main__":
         # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
     )
     db = client["edgar"]
-    collection = db["facts"]
+    collection = db["dev_facts"]
+    collection.drop()
 
     TICKER = "MPW"
-    for TICKER in ["AAPL"]:  # ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:  # insert_many duration: 4.742s
         query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
