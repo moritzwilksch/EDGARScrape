@@ -1,6 +1,12 @@
-# %%
-
 import requests
+import logging
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+log = logging.getLogger("rich")
+# -------------------------------------------------------------------------------
 
 with open("data/usGaapKeys.txt", "r") as f:
     all_keys = [line.strip() for line in f.readlines()]
@@ -81,8 +87,8 @@ class Crawler:
         try:
             self._fetch_data()
         except Exception as e:
-            print("Fetching data failed.")
-            print(e)
+            log.warning(f"Failed to fetch data for {self.cik}")
+            log.exception(e)
 
         us_gaap_facts = self.data["facts"]["us-gaap"]
         for fact in us_gaap_facts:
@@ -91,7 +97,6 @@ class Crawler:
         self.company_name = self.data["entityName"]
 
 
-#%%
 if __name__ == "__main__":
     spider = Crawler("0001318605")
     spider.populate_facts()
