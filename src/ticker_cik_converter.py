@@ -2,13 +2,22 @@ import requests
 import json
 from pymongo import MongoClient
 import os
+import logging
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+log = logging.getLogger("rich")
+# -------------------------------------------------------------------------------
+
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
 
 class CIKTickerPopulator:
-    """ Fetches json of CIK <-> Ticker mappings from the SEC and updates them in the DB """
+    """Fetches json of CIK <-> Ticker mappings from the SEC and updates them in the DB"""
 
     def __init__(self, collection=None):
         self.collection = collection
@@ -35,11 +44,15 @@ class CIKTickerPopulator:
                 continue
 
             mappings.append(
-                {"cik": int(cik_str), "ticker": ticker, "title": title,}
+                {
+                    "cik": int(cik_str),
+                    "ticker": ticker,
+                    "title": title,
+                }
             )
 
         # update mongo
-        print(f"Adding {len(mappings)} mappings.")
+        log.info(f"Adding {len(mappings)} mappings.")
 
         if mappings:
             self.collection.insert_many(mappings)  # TODO: refactor to update w/ upsert??

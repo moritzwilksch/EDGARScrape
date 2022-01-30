@@ -21,4 +21,4 @@ def increment_by_ten():
         collection.update_one({"ticker": "TSLA"}, {"$inc": {"visited": 1}})
 
 
-Parallel(n_jobs=3, prefer="threads")(delayed(increment_by_ten)() for _ in range(600))
+Parallel(n_jobs=20, prefer="threads")(delayed(increment_by_ten)() for _ in range(600))

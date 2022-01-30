@@ -1,11 +1,18 @@
+from typing import final
 from crawler import Crawler
 from pymongo import MongoClient
 import os
 from rich.console import Console
 from field_aliases import FIELD_ALIASES
-import time
+import logging
+from rich.logging import RichHandler
 
-c = Console()
+logging.basicConfig(
+    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+log = logging.getLogger("rich")
+# -------------------------------------------------------------------------------
+
 
 
 class CrawlerToMongoAdapter:
@@ -27,7 +34,7 @@ class CrawlerToMongoAdapter:
             fact_list = self.crawler.facts[fact_name]["units"][unit]
 
             # only put facts with "frame" in values array as these are the yearly stats
-            fact_list = [f for f in fact_list if f.get("frame", None)]
+            fact_list = [f for f in fact_list if f.get("frame", None) and len(f.get("frame", ())) == 6]
             fact_list.sort(key=lambda x: x["frame"])
 
             # if fact exists do not re-create it
@@ -53,26 +60,32 @@ class CrawlerToMongoAdapter:
             try:
                 values_of_alias = facts_for_db[alias].get("values", [])
             except KeyError:
-                print(f"[WARN] No fact with name {alias} found.")
+                log.warning(f"No fact with name {alias} found for {ticker}.")
                 continue
 
-            facts_for_db[final_field_name]["values"].extend(values_of_alias)
-            facts_for_db[final_field_name]["values"].sort(key=lambda x: x["frame"])
+            final_fact = facts_for_db.get(final_field_name, None)
+            if final_fact is None:
+                final_fact = {
+                    "ticker": ticker,
+                    "name": final_field_name,
+                    "values": [],
+                    "unit": "",
+                }
+
+            final_fact["values"].extend(values_of_alias)
+            final_fact["unit"] = facts_for_db[alias]["unit"]
+            final_fact["values"].sort(key=lambda x: x["frame"])
             del facts_for_db[
                 alias
             ]  # do not insert the facts with weird name: duplicates!
 
-        tic = time.perf_counter()
-        if facts_for_db:  # upsert is 10x as expensive!
-            self.collection.insert_many(list(facts_for_db.values()))
-            # for fact in facts_for_db.values():
-            #     key = {"ticker": fact["ticker"], "name": fact["name"]}
-            #     data = {"values": fact["values"], "unit": fact["unit"]}
-            #     self.collection.update_one(key, {"$set": data}, upsert=True)
+        if facts_for_db:
+            self.collection.insert_many(
+                list(facts_for_db.values())
+            )  # TODO: refactor to update w/ upsert
         else:
-            c.print(f"[yellow][WARN][/] No non-existing facts to insert for {ticker}")
-        tac = time.perf_counter()
-        print(f"Took {tac - tic} seconds.")
+            log.warning(f"No existing facts to insert for {ticker}")
+
 
 if __name__ == "__main__":
     # DB INIT
@@ -88,7 +101,7 @@ if __name__ == "__main__":
     collection.drop()
 
     TICKER = "MPW"
-    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:  # insert_many duration: 4.742s
+    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
         query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
@@ -101,4 +114,4 @@ if __name__ == "__main__":
         adapter = CrawlerToMongoAdapter(spider, collection)
         adapter.populate_database(TICKER)
 
-    c.print("Database population done.", style="green")
+    log.info("Database population done.")

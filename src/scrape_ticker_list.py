@@ -5,13 +5,18 @@ from crawler import Crawler
 from populate_mongodb import CrawlerToMongoAdapter
 import time
 from joblib import Parallel, delayed
-from rich.console import Console
+import logging
+from rich.logging import RichHandler
 
-c = Console()
+logging.basicConfig(
+    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+log = logging.getLogger("rich")
+# -------------------------------------------------------------------------------
 
 
-def read_cik_from_db(ticker: str) -> str:
-    """ Read and return CIK for ticker from DB. """
+def read_cik_from_db(ticker: str, db) -> str:
+    """Read and return CIK for ticker from DB."""
     query_result = db["ciks"].find_one({"ticker": {"$eq": ticker}})
     if query_result is not None:
         cik = str(query_result["cik"]).zfill(10)
@@ -23,51 +28,56 @@ def read_cik_from_db(ticker: str) -> str:
 
 def scrape_one_ticker(
     ticker: str,
+    db,
     data_collection: pymongo.collection.Collection,
     meta_collection: pymongo.collection.Collection,
 ):
-    """ Scrape one ticker and populate DB. Logs to `scrape_meta` collection"""
+    """Scrape one ticker and populate DB. Logs to `scrape_meta` collection"""
     metadata = {
         "ticker": ticker,
         "status": "pending",
     }  # optional: msg field with error message
-    c.print(f"Scraping {ticker}...")
+    log.info(f"Scraping {ticker}...")
     try:
         # CRAWL
-        cik = read_cik_from_db(ticker)
+        cik = read_cik_from_db(ticker, db)
         spider = Crawler(cik)  # 0001318605 = Tesla
         spider.populate_facts()
         adapter = CrawlerToMongoAdapter(spider, data_collection)
         adapter.populate_database(ticker)
         metadata["status"] = "success"
-        c.print(f"{ticker:<5} -> Success", style="green")
-    except ValueError as e:
+        log.info(f"{ticker:<5} -> [green]Success[/]", extra={"markup": True})
+    except ValueError:
         metadata["status"] = "error"
         metadata["msg"] = "cik not found"
-        c.print(f"{ticker:<5} -> CIK not found", style="yellow")
+        log.warning(f"{ticker:<5} -> CIK not found")
 
     except Exception as e:
         metadata["status"] = "error"
         metadata["msg"] = "unknown error"
-        c.print(f"{ticker:<5} -> Unkown error", style="red")
+        log.error(f"{ticker:<5} -> Unkown error")
+        log.exception(e)
 
     finally:
-        meta_collection.insert_one(metadata) 
+        meta_collection.insert_one(metadata)
 
     time.sleep(0.75)
 
 
 def main(
+    db,
     data_collection: pymongo.collection.Collection,
     meta_collection: pymongo.collection.Collection,
 ):
     with open("data/sp500_tickers.txt") as f:
         tickers = f.read().splitlines()
 
+    log.info("Dispatching threads...")
     Parallel(n_jobs=5, prefer="threads")(
-        delayed(scrape_one_ticker)(ticker, data_collection, meta_collection)
+        delayed(scrape_one_ticker)(ticker, db, data_collection, meta_collection)
         for ticker in tickers
     )
+    log.info("Done.")
 
 
 if __name__ == "__main__":
@@ -81,4 +91,4 @@ if __name__ == "__main__":
     data_collection = db["facts"]
     meta_collection = db["scrape_meta"]
 
-    main(data_collection, meta_collection)
+    main(db, data_collection, meta_collection)
