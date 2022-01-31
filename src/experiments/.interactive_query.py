@@ -1,8 +1,6 @@
 #%%
-from unicodedata import category
 from pymongo import MongoClient
 import os
-import pandas as pd
 from rich import print as print
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
