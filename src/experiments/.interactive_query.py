@@ -3,6 +3,7 @@ from unicodedata import category
 from pymongo import MongoClient
 import os
 import pandas as pd
+from rich import print as print
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
@@ -22,6 +23,13 @@ collection = db["facts"]
 #     ]
 # )
 
+#%%
+res = collection.distinct(
+    key="name",
+    filter={"values.0": {"$exists": True}},
+)
+
+print(f"Found {len(res)} distinct fact names with values.")
 #%%
 
 #%%
