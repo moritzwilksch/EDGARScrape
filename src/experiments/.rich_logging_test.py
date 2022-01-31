@@ -10,7 +10,7 @@ log.info("Hello, World!")
 x = 42
 
 log.info(f"x = {x}")
-log.warning("didnt work"")
+log.warning("didnt work")
 log.error("error")
 log.critical("critical")
 log.debug("debug")

@@ -24,4 +24,3 @@ if __name__ == "__main__":
     metric2.populate()
     c.print(metric2)
     metric2.write_to_db()
-

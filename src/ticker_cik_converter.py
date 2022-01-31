@@ -55,7 +55,9 @@ class CIKTickerPopulator:
         log.info(f"Adding {len(mappings)} mappings.")
 
         if mappings:
-            self.collection.insert_many(mappings)  # TODO: refactor to update w/ upsert??
+            self.collection.insert_many(
+                mappings
+            )  # TODO: refactor to update w/ upsert??
 
 
 if __name__ == "__main__":

@@ -14,7 +14,6 @@ log = logging.getLogger("rich")
 # -------------------------------------------------------------------------------
 
 
-
 class CrawlerToMongoAdapter:
     def __init__(self, crawler: Crawler, collection) -> None:
         self.crawler = crawler
@@ -34,8 +33,17 @@ class CrawlerToMongoAdapter:
             fact_list = self.crawler.facts[fact_name]["units"][unit]
 
             # only put facts with "frame" in values array as these are the yearly stats
-            fact_list = [f for f in fact_list if f.get("frame", None) and len(f.get("frame", ())) == 6]
+            fact_list = [
+                f
+                for f in fact_list
+                if f.get("frame", None) and len(f.get("frame", ())) == 6
+            ]
             fact_list.sort(key=lambda x: x["frame"])
+
+            # do not write fact with empty values (this can be up to 50% of facts)
+            if not fact_list:
+                log.debug(f"No facts for {fact_name} for {ticker}")
+                continue
 
             # if fact exists do not re-create it
             if f"{ticker}_{fact_name}" in self.existing_facts:
@@ -99,18 +107,18 @@ if __name__ == "__main__":
     db = client["edgar"]
     collection = db["facts"]
 
-    TICKER = "MPW"
-    for TICKER in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
-        query_result = db["ciks"].find_one({"ticker": {"$eq": TICKER}})
+    ticker = "MPW"
+    for ticker in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+        query_result = db["ciks"].find_one({"ticker": {"$eq": ticker}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)
         else:
-            raise ValueError(f"Ticker {TICKER} not found in DB")
+            raise ValueError(f"Ticker {ticker} not found in DB")
 
         # CRAWL
         spider = Crawler(cik)  # 0001318605 = Tesla
         spider.populate_facts()
         adapter = CrawlerToMongoAdapter(spider, collection)
-        adapter.populate_database(TICKER)
+        adapter.populate_database(ticker)
 
     log.info("Database population done.")

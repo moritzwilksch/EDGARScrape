@@ -8,7 +8,11 @@ class Metric:
     METRICS_COLLECTION = "metrics"
 
     def __init__(
-        self, name: str, ticker: str, raw_fields_needed: list[str], database: Database,
+        self,
+        name: str,
+        ticker: str,
+        raw_fields_needed: list[str],
+        database: Database,
     ) -> None:
         self.name = name
         self.ticker = ticker
@@ -54,14 +58,14 @@ class Metric:
         raise NotImplementedError
 
     def get_values_period_overlap(self, facts_dict: dict[str, dict]):
-        """ Returns the intersection of the periods of all values in the list. """
+        """Returns the intersection of the periods of all values in the list."""
         period_intersection = []
         for periods in facts_dict.values():
             period_intersection.append(set(period for period in periods))
         return set.intersection(*period_intersection)
 
     def pull_facts_from_db(self, *fact_names) -> dict[str, dict]:
-        """ Returns mapping fact_name -> {period: value, ...} """
+        """Returns mapping fact_name -> {period: value, ...}"""
         facts = self._pull_data_from_db()
 
         facts_to_return = {}
@@ -74,7 +78,7 @@ class Metric:
         return facts_to_return
 
     def populate(self):
-        """ Populates self.values based on self.raw_fields_needed and self.calculation() """
+        """Populates self.values based on self.raw_fields_needed and self.calculation()"""
         # maps fact_name -> list of value dicts
         facts = self.pull_facts_from_db(*self.raw_fields_needed)
         # metric calculation only possible when ALL facts are available for a period
@@ -92,7 +96,7 @@ class Metric:
             self.is_populated = True
 
     def write_to_db(self):
-        """ Writes self.values to the database. """
+        """Writes self.values to the database."""
         if not self.is_populated:
             raise ValueError("Metric must be populated before writing to database.")
         key = {"ticker": self.ticker, "name": self.name}
