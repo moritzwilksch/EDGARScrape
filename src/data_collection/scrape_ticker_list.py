@@ -28,10 +28,7 @@ def scrape_one_ticker(
     meta_collection: pymongo.collection.Collection,
 ):
     """Scrape one ticker and populate DB. Logs to `scrape_meta` collection"""
-    metadata = {
-        "ticker": ticker,
-        "status": "pending",
-    }  # optional: msg field with error message
+
     log.info(f"Scraping {ticker}...")
     try:
         # CRAWL
@@ -40,16 +37,13 @@ def scrape_one_ticker(
         spider.populate_facts()
         adapter = CrawlerToMongoAdapter(spider, data_collection)
         adapter.populate_database(ticker)
-        metadata["status"] = "success"
         log.info(f"{ticker:<5} -> [green]Success[/]", extra={"markup": True})
     except ValueError:
-        metadata["status"] = "error"
-        metadata["msg"] = "cik not found"
+        metadata = {"ticker": ticker, "status": "error", "msg": "cik not found"}
         log.warning(f"{ticker:<5} -> CIK not found")
 
     except Exception as e:
-        metadata["status"] = "error"
-        metadata["msg"] = "unknown error"
+        metadata = {"ticker": ticker, "status": "error", "msg": "unknown error"}
         log.error(f"{ticker:<5} -> Unkown error")
         log.exception(e)
 
