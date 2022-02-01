@@ -1,11 +1,6 @@
 import requests
-import logging
-from rich.logging import RichHandler
+from src.common.logger import log
 
-logging.basicConfig(
-    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
-log = logging.getLogger("rich")
 # -------------------------------------------------------------------------------
 
 with open("data/usGaapKeys.txt", "r") as f:
@@ -100,3 +95,4 @@ class Crawler:
 if __name__ == "__main__":
     spider = Crawler("0001318605")
     spider.populate_facts()
+    log.info("Done.")

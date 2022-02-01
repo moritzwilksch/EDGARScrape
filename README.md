@@ -5,6 +5,10 @@
 TODO: Folder structure
 
 ## Environment Setup
+### Set `PYTHONPATH`
+```bash
+export PYTHONPATH=/path/to/project_root
+```
 ### Pull Postgres Image
 ```console
 docker pull mongo

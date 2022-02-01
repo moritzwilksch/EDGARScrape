@@ -1,4 +1,4 @@
-from crawler import Crawler
+from data_scraping.crawler import Crawler
 from sqlalchemy.orm import backref, relation, sessionmaker, relationship
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float
 import os

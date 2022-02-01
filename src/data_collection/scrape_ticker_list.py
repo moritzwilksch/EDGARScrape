@@ -1,17 +1,12 @@
 import pymongo
 from pymongo import MongoClient
 import os
-from crawler import Crawler
-from populate_mongodb import CrawlerToMongoAdapter
+from data_scraping.crawler import Crawler
+from src.data_collection.populate_mongodb import CrawlerToMongoAdapter
 import time
 from joblib import Parallel, delayed
-import logging
-from rich.logging import RichHandler
+from src.common.logger import log
 
-logging.basicConfig(
-    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
-log = logging.getLogger("rich")
 # -------------------------------------------------------------------------------
 
 

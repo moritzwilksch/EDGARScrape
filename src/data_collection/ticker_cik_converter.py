@@ -1,14 +1,8 @@
 import requests
-import json
 from pymongo import MongoClient
 import os
-import logging
-from rich.logging import RichHandler
+from src.common.logger import log
 
-logging.basicConfig(
-    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
-log = logging.getLogger("rich")
 # -------------------------------------------------------------------------------
 
 

@@ -1,16 +1,9 @@
-from typing import final
-from crawler import Crawler
+from src.data_collection.crawler import Crawler
 from pymongo import MongoClient
 import os
-from rich.console import Console
-from field_aliases import FIELD_ALIASES
-import logging
-from rich.logging import RichHandler
+from src.common.field_aliases import FIELD_ALIASES
+from src.common.logger import log
 
-logging.basicConfig(
-    level="INFO", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
-)
-log = logging.getLogger("rich")
 # -------------------------------------------------------------------------------
 
 

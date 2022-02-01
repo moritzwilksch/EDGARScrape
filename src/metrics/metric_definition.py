@@ -1,12 +1,10 @@
 from pymongo.database import Database
 import os
 from pymongo import MongoClient
+from src.common.constants import FACTS_COLLECTION, METRICS_COLLECTION
 
 # ------------------------------ GENERIC PARENT CLASS -------------------------------------
 class Metric:
-    FACTS_COLLECTION = "facts"
-    METRICS_COLLECTION = "metrics"
-
     def __init__(
         self,
         name: str,
@@ -41,7 +39,7 @@ class Metric:
         facts = {k: None for k in self.raw_fields_needed}
 
         for fact in self.raw_fields_needed:
-            query_result = self.database[Metric.FACTS_COLLECTION].find_one(
+            query_result = self.database[FACTS_COLLECTION].find_one(
                 {"ticker": self.ticker, "name": fact}
             )
 
@@ -100,7 +98,7 @@ class Metric:
         if not self.is_populated:
             raise ValueError("Metric must be populated before writing to database.")
         key = {"ticker": self.ticker, "name": self.name}
-        self.database[Metric.METRICS_COLLECTION].update_one(
+        self.database[METRICS_COLLECTION].update_one(
             key, {"$set": {"values": self.values}}, upsert=True
         )
 

@@ -1,7 +1,7 @@
 from pymongo.database import Database
 import os
 from pymongo import MongoClient
-from metric_definition import RevenueProfitMargin, AdsToRevenue
+from src.metrics.metrics.metric_definition import RevenueProfitMargin, AdsToRevenue
 from rich.console import Console
 
 c = Console()
@@ -18,9 +18,9 @@ if __name__ == "__main__":
     metric1 = RevenueProfitMargin("AAPL", db)
     metric1.populate()
     c.print(metric1)
-    metric1.write_to_db()
+    # metric1.write_to_db()
 
     metric2 = AdsToRevenue("AAPL", db)
     metric2.populate()
     c.print(metric2)
-    metric2.write_to_db()
+    # metric2.write_to_db()

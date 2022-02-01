@@ -38,15 +38,20 @@ def get_top_matches_levenshtein(query: str, company_names: list, limit: int = 10
     matches.sort(key=lambda x: x[1])
     return matches[:limit]
 
+
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 cv = CountVectorizer(analyzer="char_wb", ngram_range=(1, 4))
 matrix = cv.fit_transform(company_names)
 
+
 def get_top_matches_cv(query, matrix, cv, limit=10):  # best so far
-    top_idxs = cosine_similarity(cv.transform([query]), matrix).argsort()[0][-limit:][::-1]
+    top_idxs = cosine_similarity(cv.transform([query]), matrix).argsort()[0][-limit:][
+        ::-1
+    ]
     return [company_names[idx] for idx in top_idxs]
+
 
 from pyinstrument import Profiler
 
