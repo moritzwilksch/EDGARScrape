@@ -1,7 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 import os
-from data_scraping.crawler import Crawler
+from src.data_collection.crawler import Crawler
 from src.data_collection.populate_mongodb import CrawlerToMongoAdapter
 import time
 from joblib import Parallel, delayed

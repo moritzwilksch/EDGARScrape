@@ -1,7 +1,7 @@
 from pymongo.database import Database
 import os
 from pymongo import MongoClient
-from src.metrics.metrics.metric_definition import RevenueProfitMargin, AdsToRevenue
+from src.metrics.metric_definition import RevenueProfitMargin, AdsToRevenue
 from rich.console import Console
 
 c = Console()
