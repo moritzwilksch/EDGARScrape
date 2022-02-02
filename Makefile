@@ -18,3 +18,6 @@ psql:
 
 run-mongo:
 	docker run -d --name edgar-mongo --restart always --env-file .env -v `pwd`/db:/data/db -p 27017:27017 mongo
+
+format:
+	black .

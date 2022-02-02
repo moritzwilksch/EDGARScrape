@@ -1,7 +1,9 @@
+from src.common.constants import FACTS_COLLECTION
+from src.metrics.metric_definition import RevenueProfitMargin, AdsToRevenue
+
 from pymongo.database import Database
 import os
 from pymongo import MongoClient
-from src.metrics.metric_definition import RevenueProfitMargin, AdsToRevenue
 from rich.console import Console
 
 c = Console()
@@ -14,7 +16,7 @@ if __name__ == "__main__":
         f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
     )
     db = client["edgar"]
-    collection = db["facts"]
+    collection = db[FACTS_COLLECTION]
     metric1 = RevenueProfitMargin("AAPL", db)
     metric1.populate()
     c.print(metric1)

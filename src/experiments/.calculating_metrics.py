@@ -1,7 +1,10 @@
 from pymongo import MongoClient
 import os
+from src.common.constants import FACTS_COLLECTION
+
 from rich.console import Console
 from rich.table import Table
+
 
 c = Console()
 
@@ -12,7 +15,7 @@ client = MongoClient(
     f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
 )
 db = client["edgar"]
-collection = db["facts"]
+collection = db[FACTS_COLLECTION]
 
 res_gross: list[dict] = collection.find(
     {"ticker": "AAPL", "name": "SalesRevenueNet"}, {"values": 1, "_id": 0}

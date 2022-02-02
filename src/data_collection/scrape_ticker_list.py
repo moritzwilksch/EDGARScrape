@@ -1,11 +1,13 @@
+from src.common.constants import FACTS_COLLECTION, LOGS_COLLECTION
+from src.data_collection.edgar_collector import Crawler
+from src.data_collection.populate_mongodb import DatabaseAdapter
+from src.common.logger import log
+
 import pymongo
 from pymongo import MongoClient
 import os
-from src.data_collection.crawler import Crawler
-from src.data_collection.populate_mongodb import CrawlerToMongoAdapter
 import time
 from joblib import Parallel, delayed
-from src.common.logger import log
 
 # -------------------------------------------------------------------------------
 
@@ -29,15 +31,16 @@ def scrape_one_ticker(
 ):
     """Scrape one ticker and populate DB. Logs to `scrape_meta` collection"""
 
-    log.info(f"Scraping {ticker}...")
+    log.debug(f"Scraping {ticker}...")
+    metadata = dict()
     try:
         # CRAWL
         cik = read_cik_from_db(ticker, db)
-        spider = Crawler(cik)  # 0001318605 = Tesla
-        spider.populate_facts()
-        adapter = CrawlerToMongoAdapter(spider, data_collection)
+        spider = Crawler(cik)
+        result = spider.fetch_facts()
+        adapter = DatabaseAdapter(result, data_collection)
         adapter.populate_database(ticker)
-        log.info(f"{ticker:<5} -> [green]Success[/]", extra={"markup": True})
+        log.debug(f"{ticker:<5} -> [green]Success[/]", extra={"markup": True})
     except ValueError:
         metadata = {"ticker": ticker, "status": "error", "msg": "cik not found"}
         log.warning(f"{ticker:<5} -> CIK not found")
@@ -48,7 +51,8 @@ def scrape_one_ticker(
         log.exception(e)
 
     finally:
-        meta_collection.insert_one(metadata)
+        if metadata:
+            meta_collection.insert_one(metadata)
 
     time.sleep(0.75)
 
@@ -61,10 +65,10 @@ def main(
     with open("data/sp500_tickers.txt") as f:
         tickers = f.read().splitlines()
 
-    log.info("Dispatching threads...")
+    log.debug("Dispatching threads...")
     Parallel(n_jobs=5, prefer="threads")(
         delayed(scrape_one_ticker)(ticker, db, data_collection, meta_collection)
-        for ticker in tickers
+        for ticker in tickers[:25]
     )
     log.info("Done.")
 
@@ -77,7 +81,7 @@ if __name__ == "__main__":
         f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
     )
     db = client["edgar"]
-    data_collection = db["facts"]
-    meta_collection = db["scrape_meta"]
+    data_collection = db[FACTS_COLLECTION]
+    meta_collection = db[LOGS_COLLECTION]
 
     main(db, data_collection, meta_collection)

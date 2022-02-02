@@ -1,3 +1,4 @@
 # Database related
-FACTS_COLLECTION = "facts"
-METRICS_COLLECTION = "metrics"
+FACTS_COLLECTION = "dev_facts"
+METRICS_COLLECTION = "dev_metrics"
+LOGS_COLLECTION = "scrape_logs"
