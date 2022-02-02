@@ -68,7 +68,7 @@ def main(
     log.debug("Dispatching threads...")
     Parallel(n_jobs=5, prefer="threads")(
         delayed(scrape_one_ticker)(ticker, db, data_collection, meta_collection)
-        for ticker in tickers[:25]
+        for ticker in tickers
     )
     log.info("Done.")
 

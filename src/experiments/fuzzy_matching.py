@@ -53,11 +53,7 @@ def get_top_matches_cv(query, matrix, cv, limit=10):  # best so far
     return [company_names[idx] for idx in top_idxs]
 
 
-from pyinstrument import Profiler
+# from pyinstrument import Profiler
+print(get_top_matches_cv("appl", matrix, cv))
 
-p = Profiler()
-with p:
-    print(get_top_matches_cv("abbot", matrix, cv))
-
-p.print()
 print("Done.")
