@@ -1,0 +1,8 @@
+:root {
+    --main-green: #004225;
+  }
+
+p.heading{
+color: var(--main-green);
+font-weight: bold;
+}
