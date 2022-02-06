@@ -1,15 +1,17 @@
-from src.data_collection.crawler import Crawler
+from src.data_collection.edgar_collector import Crawler, EdgarResult
+from src.common.field_aliases import FIELD_ALIASES
+from src.common.constants import FACTS_COLLECTION
+from src.common.logger import log
+
 from pymongo import MongoClient
 import os
-from src.common.field_aliases import FIELD_ALIASES
-from src.common.logger import log
 
 # -------------------------------------------------------------------------------
 
 
-class CrawlerToMongoAdapter:
-    def __init__(self, crawler: Crawler, collection) -> None:
-        self.crawler = crawler
+class DatabaseAdapter:
+    def __init__(self, result: EdgarResult, collection) -> None:
+        self.result = result
         self.collection = collection
 
         # load existing facts. they are stored as ticker_factname strings in a set
@@ -21,9 +23,9 @@ class CrawlerToMongoAdapter:
     def populate_database(self, ticker: str):
         """Populate databse from fields of crawler. Ticker is injected to be queried later."""
         facts_for_db = dict()
-        for fact_name in self.crawler.facts:
-            unit = list(self.crawler.facts[fact_name]["units"].keys())[0]
-            fact_list = self.crawler.facts[fact_name]["units"][unit]
+        for fact_name in self.result.facts:
+            unit = list(self.result.facts[fact_name]["units"].keys())[0]
+            fact_list = self.result.facts[fact_name]["units"][unit]
 
             # only put facts with "frame" in values array as these are the yearly stats
             fact_list = [
@@ -35,7 +37,6 @@ class CrawlerToMongoAdapter:
 
             # do not write fact with empty values (this can be up to 50% of facts)
             if not fact_list:
-                log.debug(f"No facts for {fact_name} for {ticker}")
                 continue
 
             # if fact exists do not re-create it
@@ -84,8 +85,9 @@ class CrawlerToMongoAdapter:
             self.collection.insert_many(
                 list(facts_for_db.values())
             )  # TODO: refactor to update w/ upsert
+            log.debug(f"Inserted {len(facts_for_db)} facts for {ticker}")
         else:
-            log.warning(f"No existing facts to insert for {ticker}")
+            log.info(f"No existing facts to insert for {ticker}")
 
 
 if __name__ == "__main__":
@@ -98,7 +100,7 @@ if __name__ == "__main__":
         # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
     )
     db = client["edgar"]
-    collection = db["facts"]
+    collection = db[FACTS_COLLECTION]
 
     ticker = "MPW"
     for ticker in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
@@ -110,8 +112,8 @@ if __name__ == "__main__":
 
         # CRAWL
         spider = Crawler(cik)  # 0001318605 = Tesla
-        spider.populate_facts()
-        adapter = CrawlerToMongoAdapter(spider, collection)
+        result = spider.fetch_facts()
+        adapter = DatabaseAdapter(result, collection)
         adapter.populate_database(ticker)
 
     log.info("Database population done.")

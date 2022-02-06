@@ -1,7 +1,10 @@
 #%%
+from src.common.constants import FACTS_COLLECTION
+
 from pymongo import MongoClient
 import os
 from rich import print as print
+
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
@@ -11,7 +14,7 @@ client = MongoClient(
     # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
 )
 db = client["edgar"]
-collection = db["facts"]
+collection = db[FACTS_COLLECTION]
 
 #%%
 # res = collection.aggregate(
