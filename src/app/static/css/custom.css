@@ -1,5 +1,6 @@
 :root {
     --main-green: #006338;
+    --main-green-darker: #004628;
   }
 
 html{
@@ -53,6 +54,15 @@ span.unit{
   font-weight: normal;
 }
 
+button.mainColorButton{
+  background-color: var(--main-green);
+  border-color: var(--main-green);
+}
+
+button.mainColorButton:hover{
+  background-color: var(--main-green-darker);
+  border-color: var(--main-green);
+}
 
 
 footer {

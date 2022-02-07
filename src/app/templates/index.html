@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
     <link rel="stylesheet" href="{{ url_for('static', path='css/custom.css') }}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
 </head>
 
 <body>
@@ -35,6 +38,8 @@
         <div class="row m-3 mt-5 mb-5" id="metrics">
             <div class="col-sm-4">
                 <h1>Stonks <br>only go <strong><span class="highlight"> uppppp</span></strong></h1>
+                <p class="text-muted" style="text-align: left;">* T&Cs apply. Sometimes they go down.</p>
+
             </div>
             <div class="col-sm-8">
                 <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
@@ -53,6 +58,7 @@
 
     <!-- PART II -->
     <h1 style="text-align: center;" class="mt-5">Some random metrics</h1>
+    <p class="text-muted" style="text-align: center;">Because bold numbers look cool.</p>
     <div class="container">
         <div class="row ml-5 mr-5 mt-3 mb-5">
             <div class="col-sm-4 mb-5 grow">
@@ -60,8 +66,9 @@
                 <div class="card h-100 m-3 bg-light shadow">
                     <div class="card-body pb-0">
                         <!-- <h5 class="vanityMetricTitle highlight mb-4">🏭</h5> -->
-                        <h5 class="vanityMetricTitle highlight mb-4"><span class="material-icons" style="font-size: 1.5em">business</span></h5>
-                        <h5 class="vanityMetricTitle highlight mb-4">697</h5>
+                        <h5 class="vanityMetricTitle highlight mb-3"><span class="material-icons"
+                                style="font-size: 1.5em">business</span></h5>
+                        <h5 class="vanityMetricTitle highlight mb-2">697</h5>
                         <h6 class="vanityMetricSubTitle">of Fortune 500 companies use our service</h6>
                     </div>
                 </div>
@@ -71,10 +78,11 @@
                 <div class="card h-100 m-3 bg-light shadow">
                     <div class="card-body pb-0">
 
-                        <!-- <h5 class="vanityMetricTitle highlight mb-4">👤</h5> -->
-                        <h5 class="vanityMetricTitle highlight mb-4"><span class="material-icons" style="font-size: 1.5em">people_outline</span></h5>
+                        <!-- <h5 class="vanityMetricTitle highlight mb-3">👤</h5> -->
+                        <h5 class="vanityMetricTitle highlight mb-3"><span class="material-icons"
+                                style="font-size: 1.5em">people_outline</span></h5>
 
-                        <h5 class="vanityMetricTitle highlight mb-4">21B</h5>
+                        <h5 class="vanityMetricTitle highlight mb-2">21B</h5>
                         <h6 class="vanityMetricSubTitle">Active Users<br></h6>
                     </div>
                 </div>
@@ -83,10 +91,11 @@
                 <!-- Card 3 -->
                 <div class="card h-100 m-3 bg-light shadow">
                     <div class="card-body pb-0">
-                        <!-- <h5 class="vanityMetricTitle highlight mb-4">💰</h5> -->
-                        <h5 class="vanityMetricTitle highlight mb-4"><span class="material-icons" style="font-size: 1.5em">attach_money</span></h5>
+                        <!-- <h5 class="vanityMetricTitle highlight mb-3">💰</h5> -->
+                        <h5 class="vanityMetricTitle highlight mb-3"><span class="material-icons"
+                                style="font-size: 1.5em">attach_money</span></h5>
 
-                        <h5 class="vanityMetricTitle highlight mb-4">1.7 Gazillion</h5>
+                        <h5 class="vanityMetricTitle highlight mb-2">1.7 Gazillion</h5>
                         <h6 class="vanityMetricSubTitle">$$$ earned because stonks go up</h6>
                     </div>
                 </div>
@@ -97,10 +106,41 @@
     <!-- end of part II -->
 
 
-    <!-- Start of Comparison Table -->
     <h1 style="text-align: center;" class="mt-5">Compare Stuff!</h1>
+    <p class="text-muted" style="text-align: center;">By using our epic service.</p>
+
+    <!-- Input Ticker -->
+    <div class="container">
+        <div class="row mt-3 mb-5 justify-content-center">
+            <div class="col-sm-8">
+                <div class="card h-100 bg-light shadow">
+                    <div class="card-body pb-0">
+                        <!-- FORM -->
+                        <form>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1" class="tableEmph">Ticker</label>
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="smallNote" placeholder="Enter company Ticker...">
+                                <small id="smallNote" class="form-text text-muted">Just enter the ticker. It's not that
+                                    hard.</small>
+                            </div>
+                            <div class="d-flex justify-content-center mb-3"><button type="submit"
+                                    class="btn btn-primary mainColorButton"><span class="material-icons-outlined"
+                                        style="vertical-align: middle;">compare_arrows</span> Compare</button></div>
+                        </form>
+                        <!-- ENDOF Form -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Of Input Ticker -->
+
+
+    <!-- Table: Profitability -->
     <div class="container">
         <div class="row ml-5 mr-5 mt-3 mb-5">
+            <h3 class="highlight">Profitability</h3>
             <table class="table table-sm shadow mt-3">
                 <thead class="bg-light tableEmph">
                     <tr>
@@ -124,7 +164,35 @@
             </table>
         </div>
     </div>
-    <!-- end of comparison table -->
+    <!-- end of Table: Profitability -->
+
+    <!-- Table: Captial Structure -->
+    <div class="container">
+        <div class="row ml-5 mr-5 mt-3 mb-5">
+            <h3 class="highlight">Capital Structure</h3>
+            <table class="table table-sm shadow mt-3">
+                <thead class="bg-light tableEmph">
+                    <tr>
+                        <td></td>
+                        {%for company_name in data["companies"] %}
+                        <td class="centerContent">{{company_name}}</td>
+                        {%endfor%}
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for metric_name, metric_values_dict in data["table_data"].items() %}
+                    <tr>
+                        <td class="tableEmph bg-light">{{metric_name}}<span
+                                class="unit">{{data["units"][metric_name]}}</span></td>
+                        {% for value in metric_values_dict.values()%}
+                        <td class="centerContent">{{value}}</td>
+                        {% endfor %}
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 
 
@@ -137,7 +205,7 @@
 
 
     <footer>
-        <div class="text-center p-3 bg-light">
+        <div class="text-center p-3 bg-light mt-5">
             © 2021 Copyright: Us.
         </div>
         <!-- Copyright -->
