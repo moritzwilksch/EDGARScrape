@@ -1,8 +1,26 @@
 :root {
-    --main-green: #004225;
+    --main-green: #006338;
   }
 
-p.heading{
-color: var(--main-green);
-font-weight: bold;
+html{
+  scroll-behavior: smooth;
+}
+
+
+.highlight{
+  color: var(--main-green);
+  font-weight: bold;
+}
+ 
+h5.vanityMetricTitle{
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+}
+
+h6.vanityMetricSubTitle{
+    font-size: 1.25em;
+    /* font-weight: bold; */
+    color: grey;
+    text-align: center;
 }

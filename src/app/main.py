@@ -12,7 +12,7 @@ templates = Jinja2Templates(directory="src/app/templates")
 
 app = FastAPI()
 app.mount(
-    "/static",
+    "/src/app/static",
     StaticFiles(directory=Path(__file__).parent.absolute() / "static"),
     name="static",
 )
