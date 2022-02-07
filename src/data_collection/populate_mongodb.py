@@ -103,7 +103,7 @@ if __name__ == "__main__":
     collection = db[FACTS_COLLECTION]
 
     ticker = "MPW"
-    for ticker in ["AAPL", "TSLA", "MPW", "JPM", "F"]:
+    for ticker in ["AAPL", "TSLA", "MPW", "JPM", "F", "MSFT", "GOOG", "FB", "AMZN"]:
         query_result = db["ciks"].find_one({"ticker": {"$eq": ticker}})
         if query_result is not None:
             cik = str(query_result["cik"]).zfill(10)

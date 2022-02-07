@@ -1,7 +1,10 @@
+from email import header
 import requests
 from pymongo import MongoClient
 import os
 from src.common.logger import log
+import time
+from joblib import Parallel, delayed, parallel_backend
 
 # -------------------------------------------------------------------------------
 
@@ -15,6 +18,11 @@ class CIKTickerPopulator:
 
     def __init__(self, collection=None):
         self.collection = collection
+
+        self.headers = {
+            "User-Agent": "Duke University info@duke.edu www.duke.edu",  # EDGAR requires basic ID
+            "Accept-Encoding": "gzip, deflate",
+        }
 
         # load all existing ciks in memory to only add the new ones
         self.existing_ciks = set()
@@ -49,9 +57,31 @@ class CIKTickerPopulator:
         log.info(f"Adding {len(mappings)} mappings.")
 
         if mappings:
-            self.collection.insert_many(
-                mappings
-            )  # TODO: refactor to update w/ upsert??
+            self.collection.insert_many(mappings)  # TODO: refactor to update w/ upsert??
+
+    def _pull_industry_from_api(self, cik):
+        try:
+            response = requests.get(
+                f"https://data.sec.gov/submissions/CIK{str(cik).zfill(10)}.json",
+                headers=self.headers,
+            )
+        except:
+            log.warning("API call failed.")
+            return None
+
+        self.collection.update_one(
+            {"cik": cik}, {"$set": {"industry": response.json().get("sicDescription")}}
+        )
+        log.debug(f"Got industry for CIK {cik}")
+        time.sleep(1)
+
+    def pull_all_industries_from_api(self, only_add_nonexisting: bool = True):
+        ciks = [item.get("cik") for item in self.collection.find({"industry": {"$exists": not only_add_nonexisting}}, {"cik": 1})]
+
+        _ = Parallel(n_jobs=4, prefer="threads")(
+            delayed(self._pull_industry_from_api)(cik) for cik in ciks
+        )
+        log.info("Fetching industries DONE.")
 
 
 if __name__ == "__main__":
@@ -69,3 +99,4 @@ if __name__ == "__main__":
     # Populate
     populator = CIKTickerPopulator(collection=collection)
     populator.populate_database()
+    populator.pull_all_industries_from_api()
