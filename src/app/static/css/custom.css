@@ -24,3 +24,42 @@ h6.vanityMetricSubTitle{
     color: grey;
     text-align: center;
 }
+
+
+/* -------- Table-related -------- */
+.tableEmph{
+  font-weight: bold;
+  font-size: 1.05em;
+  text-align: left;
+}
+
+table
+{ 
+margin-left: auto;
+margin-right: auto;
+}
+
+td.centerContent{
+  text-align: center;
+}
+
+span.unit{
+  /* text-align: right; */
+  float:right;
+  color: silver;
+  font-weight: normal;
+}
+
+/* --------- Animations ---------- */
+/* scale cards */
+.grow { transition: all .2s ease-in-out; }
+.grow:hover { transform: scale(1.05); }
+
+
+/* table hover */
+:not(thead) > tr:hover {
+   color: var(--main-green) !important; 
+   font-weight: bold;
+   background-color: var(--light);
+}
+/* tr:hover td { background: transparent; } */
