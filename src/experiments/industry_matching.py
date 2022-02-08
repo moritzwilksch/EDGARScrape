@@ -23,4 +23,4 @@ def get_same_industry(ticker: str):
     industries = set([item.get("industry") for item in results])
     return list(collection.find({"industry": {"$in": list(industries)}}))
 
-print(get_same_industry("AAPL"))
+print(get_same_industry("MSFT"))
