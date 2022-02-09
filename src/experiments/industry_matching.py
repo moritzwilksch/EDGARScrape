@@ -1,4 +1,3 @@
-from gc import collect
 from src.common.constants import CIK_COLLECTION
 import os
 from pymongo import MongoClient
@@ -23,4 +22,6 @@ def get_same_industry(ticker: str):
     industries = set([item.get("industry") for item in results])
     return list(collection.find({"industry": {"$in": list(industries)}}))
 
-print(get_same_industry("MSFT"))
+# print(get_same_industry("MSFT"))
+
+import yfinance as yf

@@ -1,5 +1,5 @@
+from traceback import FrameSummary
 from src.common.constants import FACTS_COLLECTION
-
 
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
@@ -8,6 +8,9 @@ from pathlib import Path
 import os
 from pymongo import MongoClient
 from rich import print
+from jsonpath_ng import parse
+
+FRAMES_JSONPATH = parse("values[*].frame")
 
 # DB INIT
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
@@ -49,34 +52,37 @@ stub = {
 def get_most_recent_common_fact_values(fact_name: str, tickers: list):
     query = {"name": fact_name, "ticker": {"$in": tickers}}
     results = list(collection.find(query))
-    values = [item.get("values") for item in results]
-    frame_sets = []
-    for val in values:
-        frame_sets.append(set([item.get("frame") for item in val]))
 
+    frame_sets = []
+    for item in results:
+        frame_sets.append(set(m.value for m in FRAMES_JSONPATH.find(item)))
     most_recent_common_frame = max(set.intersection(*frame_sets))
 
-    return_data = {
-        fact_name: dict()
-    }
+    return_data = {fact_name: dict()}
 
     for res in results:
-        value = [val["val"] for val in res["values"] if val["frame"] == most_recent_common_frame][0]
+        value = [
+            val["val"]
+            for val in res["values"]
+            if val["frame"] == most_recent_common_frame
+        ][0]
         return_data[fact_name][res["ticker"]] = value
 
     return most_recent_common_frame, return_data
 
 
-
-
-print(get_most_recent_common_fact_values("Revenues", ["AAPL", "MSFT"]))
-
-
+print(
+    get_most_recent_common_fact_values("Revenues", ["AAPL", "MSFT", "GOOG", "AMZN", "FB"])
+)
 
 
 @app.get("/")
 async def root(request: Request):
-    print(get_most_recent_common_fact_values("Revenues", ["AAPL", "MSFT", "GOOG", "AMZN", "FB"]))
+    print(
+        get_most_recent_common_fact_values(
+            "Revenues", ["AAPL", "MSFT", "GOOG", "AMZN", "FB"]
+        )
+    )
     return templates.TemplateResponse(
         "index.html", {"request": request, "id": id, "data": stub}
     )
