@@ -47,10 +47,10 @@ class MarketCapFetcher:
         return None
 
 
-# tickers = ["AAPL", "AMZN", "F", "FB", "GOOG", "JPM", "MPW", "MSFT", "TSLA"]
+tickers = ["AAPL", "AMZN", "F", "FB", "GOOG", "JPM", "MPW", "MSFT", "TSLA"]
 # tickers = collection.distinct("ticker")[:100]
-with open("data/sp500_tickers.txt") as f:
-    tickers = [t.strip() for t in f.readlines()]
+# with open("data/sp500_tickers.txt") as f:
+#     tickers = [t.strip() for t in f.readlines()]
 
 
 
@@ -70,6 +70,6 @@ print(mcs)
 print(f"Took {tac-tic} seconds")
 
 
-for d in mcs:
-    if d.get("marketcap"):
-        collection.update_many({"ticker": d.get("ticker")}, {"$set": {"marketcap": d.get("marketcap")}})
+# for d in mcs:
+#     if d.get("marketcap"):
+#         collection.update_many({"ticker": d.get("ticker")}, {"$set": {"marketcap": d.get("marketcap")}})

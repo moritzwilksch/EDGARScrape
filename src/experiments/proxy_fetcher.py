@@ -56,7 +56,7 @@ def is_working(proxy: Proxy):
     return False
 
 
-working = Parallel(n_jobs=100, prefer="threads")(
+working = Parallel(n_jobs=10, prefer="processes")(
     delayed(is_working)(proxy) for proxy in proxies
 )
 
