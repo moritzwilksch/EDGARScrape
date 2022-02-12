@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 import os
 from rich import print as print
-from polyleven import levenshtein
+# from polyleven import levenshtein
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
@@ -12,7 +12,8 @@ client = MongoClient(
 
 db = client["edgar"]
 
-company_names = db.ciks.distinct("title")
+company_names = db.ciks.distinct("title", filter={"title": {"$exists": True}})
+company_names = [n for n in company_names if n]
 
 
 def normalize(s: str):
@@ -54,6 +55,6 @@ def get_top_matches_cv(query, matrix, cv, limit=10):  # best so far
 
 
 # from pyinstrument import Profiler
-print(get_top_matches_cv("appl", matrix, cv))
+print(get_top_matches_cv("micro", matrix, cv))
 
 print("Done.")

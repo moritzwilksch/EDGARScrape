@@ -8,6 +8,7 @@ import os
 from pymongo import MongoClient
 from rich import print
 import random
+
 # DB INIT
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
@@ -22,6 +23,7 @@ with open("data/working_proxies.txt", "r") as f:
     proxies = f.readlines()
 
 print(f"Found {len(proxies)} proxies")
+
 
 class MarketCapFetcher:
     def __init__(self, ticker: str):
@@ -47,11 +49,10 @@ class MarketCapFetcher:
         return None
 
 
-tickers = ["AAPL", "AMZN", "F", "FB", "GOOG", "JPM", "MPW", "MSFT", "TSLA"]
-# tickers = collection.distinct("ticker")[:100]
-# with open("data/sp500_tickers.txt") as f:
-#     tickers = [t.strip() for t in f.readlines()]
-
+# tickers = ["AAPL", "AMZN", "F", "FB", "GOOG", "JPM", "MPW", "MSFT", "TSLA"]
+tickers = collection.distinct("ticker")[:100]
+with open("data/sp500_tickers.txt") as f:
+    tickers = [t.strip() for t in f.readlines()]
 
 
 def get_market_cap(ticker: str):
@@ -61,15 +62,35 @@ def get_market_cap(ticker: str):
     return {"ticker": ticker, "marketcap": result}
 
 
-tic = time.perf_counter()
-mcs = Parallel(prefer="processes", n_jobs=10, verbose=100)(
-    delayed(get_market_cap)(ticker) for ticker in tickers
-)
-tac = time.perf_counter()
-print(mcs)
-print(f"Took {tac-tic} seconds")
+def number_literal_to_float(num: str) -> float:
+    """Convert a number literal to a float, e.g. 1.2M USD -> 1200000.0. Ignores currency."""
+    num = num.lower().replace("usd", "").replace("cad", "").replace(",", "").strip()
+    suffix = num[-1]
+    multiplier = 1
+    if suffix == "t":
+        multiplier = 1_000_000_000_000
+    if suffix == "b":
+        multiplier = 1_000_000_000
+    elif suffix == "m":
+        multiplier = 1_000_000
+    elif suffix == "k":
+        multiplier = 1_000
+
+    return float(num[:-1]) * multiplier
 
 
-# for d in mcs:
-#     if d.get("marketcap"):
-#         collection.update_many({"ticker": d.get("ticker")}, {"$set": {"marketcap": d.get("marketcap")}})
+if __name__ == "__main__":
+    tic = time.perf_counter()
+    mcs = Parallel(prefer="processes", n_jobs=10, verbose=100)(
+        delayed(get_market_cap)(ticker) for ticker in tickers
+    )
+    tac = time.perf_counter()
+    print(mcs)
+    print(f"Took {tac-tic} seconds")
+
+    for d in mcs:
+        if d.get("marketcap"):
+            collection.update_many(
+                {"ticker": d.get("ticker")},
+                {"$set": {"marketcap": number_literal_to_float(d.get("marketcap"))}},
+            )
