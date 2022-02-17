@@ -1,10 +1,11 @@
-from src.data_collection.edgar_collector import Crawler, EdgarResult
-from src.common.field_aliases import FIELD_ALIASES
-from src.common.constants import FACTS_COLLECTION
-from src.common.logger import log
+import os
 
 from pymongo import MongoClient
-import os
+
+from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
+from src.common.field_aliases import FIELD_ALIASES
+from src.common.logger import log
+from src.data_collection.edgar_collector import Crawler, EdgarResult
 
 # -------------------------------------------------------------------------------
 
@@ -95,10 +96,7 @@ if __name__ == "__main__":
     mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(
-        f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-        # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
-    )
+    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
     db = client["edgar"]
     collection = db[FACTS_COLLECTION]
 

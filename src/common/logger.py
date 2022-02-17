@@ -1,5 +1,6 @@
-from rich.logging import RichHandler
 import logging
+
+from rich.logging import RichHandler
 
 # logging.getLogger("requests").setLevel(logging.WARNING)  # silence requests DEBUG
 logging.getLogger("urllib3").propagate = False

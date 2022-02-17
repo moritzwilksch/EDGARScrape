@@ -1,14 +1,14 @@
-from pymongo import MongoClient
 import os
+
 from joblib import Parallel, delayed
+from pymongo import MongoClient
+
+from src.common.constants import DB_CONNECTION_STRING
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-    # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
-)
+client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
 db = client["edgar"]
 collection = db["compute_tasks"]
 

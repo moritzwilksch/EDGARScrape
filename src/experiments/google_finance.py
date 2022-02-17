@@ -1,21 +1,20 @@
+import os
+import random
 import time
+
 import requests
 from bs4 import BeautifulSoup
 from joblib import Parallel, delayed
-
-from src.common.constants import CIK_COLLECTION
-import os
 from pymongo import MongoClient
 from rich import print
-import random
+
+from src.common.constants import CIK_COLLECTION, DB_CONNECTION_STRING
 
 # DB INIT
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-)
+client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
 db = client["edgar"]
 collection = db[CIK_COLLECTION]
 

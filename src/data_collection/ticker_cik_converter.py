@@ -1,10 +1,13 @@
-from email import header
-import requests
-from pymongo import MongoClient
 import os
-from src.common.logger import log
 import time
+from email import header
+
+import requests
 from joblib import Parallel, delayed, parallel_backend
+from pymongo import MongoClient
+
+from src.common.constants import DB_CONNECTION_STRING
+from src.common.logger import log
 
 # -------------------------------------------------------------------------------
 
@@ -57,7 +60,9 @@ class CIKTickerPopulator:
         log.info(f"Adding {len(mappings)} mappings.")
 
         if mappings:
-            self.collection.insert_many(mappings)  # TODO: refactor to update w/ upsert??
+            self.collection.insert_many(
+                mappings
+            )  # TODO: refactor to update w/ upsert??
 
     def _pull_industry_from_api(self, cik):
         try:
@@ -76,7 +81,12 @@ class CIKTickerPopulator:
         time.sleep(1)
 
     def pull_all_industries_from_api(self, only_add_nonexisting: bool = True):
-        ciks = [item.get("cik") for item in self.collection.find({"industry": {"$exists": not only_add_nonexisting}}, {"cik": 1})]
+        ciks = [
+            item.get("cik")
+            for item in self.collection.find(
+                {"industry": {"$exists": not only_add_nonexisting}}, {"cik": 1}
+            )
+        ]
 
         _ = Parallel(n_jobs=4, prefer="threads")(
             delayed(self._pull_industry_from_api)(cik) for cik in ciks
@@ -89,10 +99,7 @@ if __name__ == "__main__":
     mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(
-        f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-        # authSource referrs to admin collection in mongo, this needs to be here as a param otherwise: AuthenticationFailed
-    )
+    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
     db = client["edgar"]
     collection = db["ciks"]
 

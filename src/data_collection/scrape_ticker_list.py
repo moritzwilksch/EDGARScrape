@@ -1,13 +1,15 @@
-from src.common.constants import FACTS_COLLECTION, LOGS_COLLECTION
-from src.data_collection.edgar_collector import Crawler
-from src.data_collection.populate_mongodb import DatabaseAdapter
-from src.common.logger import log
-
-import pymongo
-from pymongo import MongoClient
 import os
 import time
+
+import pymongo
 from joblib import Parallel, delayed
+from pymongo import MongoClient
+
+from src.common.constants import (DB_CONNECTION_STRING, FACTS_COLLECTION,
+                                  LOGS_COLLECTION)
+from src.common.logger import log
+from src.data_collection.edgar_collector import Crawler
+from src.data_collection.populate_mongodb import DatabaseAdapter
 
 # -------------------------------------------------------------------------------
 
@@ -77,9 +79,7 @@ if __name__ == "__main__":
     mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(
-        f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
-    )
+    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
     db = client["edgar"]
     data_collection = db[FACTS_COLLECTION]
     meta_collection = db[LOGS_COLLECTION]

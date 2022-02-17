@@ -1,19 +1,17 @@
-from pymongo import MongoClient
 import os
-from src.common.constants import FACTS_COLLECTION
 
+from pymongo import MongoClient
 from rich.console import Console
 from rich.table import Table
 
+from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
 
 c = Console()
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
-)
+client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
 db = client["edgar"]
 collection = db[FACTS_COLLECTION]
 

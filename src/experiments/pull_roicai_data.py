@@ -1,8 +1,9 @@
-import requests
-import joblib
-from rich import print
-from bs4 import BeautifulSoup
 import json
+
+import joblib
+import requests
+from bs4 import BeautifulSoup
+from rich import print
 
 
 class RoicaiCrawler:

@@ -1,7 +1,8 @@
-from src.common.logger import log
+from dataclasses import dataclass
 
 import requests
-from dataclasses import dataclass
+
+from src.common.logger import log
 
 
 @dataclass

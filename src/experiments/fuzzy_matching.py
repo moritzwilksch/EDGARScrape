@@ -1,14 +1,17 @@
-from pymongo import MongoClient
+import imp
 import os
+
+from pymongo import MongoClient
 from rich import print as print
+
+from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
+
 # from polyleven import levenshtein
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar", authSource="admin"
-)
+client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
 
 db = client["edgar"]
 

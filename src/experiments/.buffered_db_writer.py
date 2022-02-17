@@ -1,8 +1,10 @@
 # Bufferrs data before writing it. Useful for speed?
 
+import random
+import time
 from queue import Queue
 from threading import Thread
-import time, random
+
 
 class BufferedDBWriter:
     def __init__(self):
@@ -18,7 +20,7 @@ class BufferedDBWriter:
             if len(self.buffer) == 5:
                 print(f"[WRITING] {self.buffer}")
                 self.buffer = []
-            
+
             data = self.incoming_data.get()
             if data == "<ENDOFQUEUE>":
                 break
@@ -26,7 +28,7 @@ class BufferedDBWriter:
 
     def start_worker(self):
         Thread(target=self.worker).start()
-    
+
     def close(self):
         self.incoming_data.put("<ENDOFQUEUE>")
 
@@ -34,5 +36,5 @@ class BufferedDBWriter:
 bw = BufferedDBWriter()
 for i in range(100):
     bw.write(i)
-    time.sleep(random.randrange(1, 50)/100)
+    time.sleep(random.randrange(1, 50) / 100)
 bw.close()

@@ -3,3 +3,7 @@ requests
 black
 rich
 jsonpath-ng
+fastapi
+uvicorn
+jinja2
+isort

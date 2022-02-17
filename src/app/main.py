@@ -1,14 +1,15 @@
+import os
+from pathlib import Path
 from traceback import FrameSummary
-from src.common.constants import FACTS_COLLECTION
 
 from fastapi import FastAPI, Request
-from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-import os
+from fastapi.templating import Jinja2Templates
+from jsonpath_ng import parse
 from pymongo import MongoClient
 from rich import print
-from jsonpath_ng import parse
+
+from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
 
 FRAMES_JSONPATH = parse("values[*].frame")
 
@@ -16,9 +17,7 @@ FRAMES_JSONPATH = parse("values[*].frame")
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(
-    f"mongodb://{mongo_user}:{mongo_pass}@localhost:27017/edgar?authSource=admin"
-)
+client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
 db = client["edgar"]
 collection = db[FACTS_COLLECTION]
 
@@ -72,7 +71,9 @@ def get_most_recent_common_fact_values(fact_name: str, tickers: list):
 
 
 print(
-    get_most_recent_common_fact_values("Revenues", ["AAPL", "MSFT", "GOOG", "AMZN", "FB"])
+    get_most_recent_common_fact_values(
+        "Revenues", ["AAPL", "MSFT", "GOOG", "AMZN", "FB"]
+    )
 )
 
 

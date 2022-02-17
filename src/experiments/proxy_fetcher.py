@@ -1,9 +1,10 @@
-import requests
+import re
 from dataclasses import dataclass
+
 import pandas as pd
+import requests
 from joblib import Parallel, delayed
 from rich import print
-import re
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
@@ -42,7 +43,9 @@ def is_working(proxy: Proxy):
     try:
         response = requests.get(
             f"{protocol}://api.ipify.org",
-            proxies={protocol: f"{protocol}://{proxy.ip}:{proxy.port}",},
+            proxies={
+                protocol: f"{protocol}://{proxy.ip}:{proxy.port}",
+            },
             timeout=3,
             headers=headers,
         )
