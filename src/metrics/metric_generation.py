@@ -5,7 +5,7 @@ from pymongo.database import Database
 from rich.console import Console
 
 from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
-from src.metrics.metric_definition import AdsToRevenue, RevenueProfitMargin
+from src.metrics.metric_definition import AdsToRevenue, FreeCashFlow, RevenueProfitMargin
 
 c = Console()
 
@@ -24,4 +24,7 @@ if __name__ == "__main__":
     metric2 = AdsToRevenue("AAPL", db)
     metric2.populate()
     c.print(metric2)
-    # metric2.write_to_db()
+
+    metric3 = FreeCashFlow("AAPL", db)
+    metric3.populate()
+    c.print(metric3)

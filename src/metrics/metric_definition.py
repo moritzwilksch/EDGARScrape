@@ -135,3 +135,22 @@ class AdsToRevenue(Metric):
         return (
             facts["AdvertisingExpense"][period] / facts["Revenues"][period]
         )  # CHANGE THIS
+
+
+class FreeCashFlow(Metric):
+    def __init__(self, ticker, database):
+        super().__init__(
+            name="FreeCashFlow",  # CHANGE THIS
+            ticker=ticker,
+            raw_fields_needed=[
+                "NetCashProvidedByUsedInOperatingActivities",
+                "PaymentsToAcquirePropertyPlantAndEquipment",
+            ],  # CHANGE THIS
+            database=database,
+        )
+
+    def calculation(self, period, facts):
+        return (
+            facts["NetCashProvidedByUsedInOperatingActivities"][period]
+            - facts["PaymentsToAcquirePropertyPlantAndEquipment"][period]
+        )  # CHANGE THIS
