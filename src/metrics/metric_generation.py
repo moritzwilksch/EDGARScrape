@@ -19,12 +19,14 @@ if __name__ == "__main__":
     metric1 = RevenueProfitMargin("AAPL", db)
     metric1.populate()
     c.print(metric1)
-    # metric1.write_to_db()
+    metric1.write_to_db()
 
     metric2 = AdsToRevenue("AAPL", db)
     metric2.populate()
     c.print(metric2)
+    metric2.write_to_db()
 
     metric3 = FreeCashFlow("AAPL", db)
     metric3.populate()
     c.print(metric3)
+    metric3.write_to_db()
