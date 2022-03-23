@@ -3,13 +3,13 @@ import os
 from pymongo import MongoClient
 from rich import print
 
-from src.common.constants import CIK_COLLECTION, DB_CONNECTION_STRING
+from src.common.constants import AUTH_SOURCE, CIK_COLLECTION, DB_CONNECTION_STRING
 
 # DB INIT
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+client = MongoClient(DB_CONNECTION_STRING, authSource=AUTH_SOURCE)
 db = client["edgar"]
 collection = db[CIK_COLLECTION]
 

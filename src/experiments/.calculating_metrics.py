@@ -4,14 +4,14 @@ from pymongo import MongoClient
 from rich.console import Console
 from rich.table import Table
 
-from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
+from src.common.constants import AUTH_SOURCE, DB_CONNECTION_STRING, FACTS_COLLECTION
 
 c = Console()
 
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+client = MongoClient(DB_CONNECTION_STRING, authSource=AUTH_SOURCE)
 db = client["edgar"]
 collection = db[FACTS_COLLECTION]
 

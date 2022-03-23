@@ -4,8 +4,12 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from rich.console import Console
 
-from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
-from src.metrics.metric_definition import AdsToRevenue, FreeCashFlow, RevenueProfitMargin
+from src.common.constants import AUTH_SOURCE, DB_CONNECTION_STRING, FACTS_COLLECTION
+from src.metrics.metric_definition import (
+    AdsToRevenue,
+    FreeCashFlow,
+    RevenueProfitMargin,
+)
 
 c = Console()
 
@@ -13,7 +17,7 @@ if __name__ == "__main__":
     mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+    client = MongoClient(DB_CONNECTION_STRING, authSource=AUTH_SOURCE)
     db = client["edgar"]
     collection = db[FACTS_COLLECTION]
     metric1 = RevenueProfitMargin("AAPL", db)

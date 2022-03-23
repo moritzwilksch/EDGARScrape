@@ -93,10 +93,10 @@ class DatabaseAdapter:
 
 if __name__ == "__main__":
     # DB INIT
-    mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
-    mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
+    # mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
+    # mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+    client = MongoClient(DB_CONNECTION_STRING, authSource="edgar")
     db = client["edgar"]
     collection = db[FACTS_COLLECTION]
 

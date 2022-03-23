@@ -9,7 +9,7 @@ from jsonpath_ng import parse
 from pymongo import MongoClient
 from rich import print
 
-from src.common.constants import DB_CONNECTION_STRING, FACTS_COLLECTION
+from src.common.constants import AUTH_SOURCE, DB_CONNECTION_STRING, FACTS_COLLECTION
 
 FRAMES_JSONPATH = parse("values[*].frame")
 
@@ -17,7 +17,7 @@ FRAMES_JSONPATH = parse("values[*].frame")
 mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+client = MongoClient(DB_CONNECTION_STRING, authSource=AUTH_SOURCE)
 db = client["edgar"]
 collection = db[FACTS_COLLECTION]
 

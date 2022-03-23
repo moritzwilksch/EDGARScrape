@@ -6,7 +6,7 @@ import requests
 from joblib import Parallel, delayed, parallel_backend
 from pymongo import MongoClient
 
-from src.common.constants import DB_CONNECTION_STRING
+from src.common.constants import AUTH_SOURCE, DB_CONNECTION_STRING
 from src.common.logger import log
 
 # -------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     mongo_user = os.getenv("MONGO_INITDB_ROOT_USERNAME")
     mongo_pass = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 
-    client = MongoClient(DB_CONNECTION_STRING, authSource="admin")
+    client = MongoClient(DB_CONNECTION_STRING, authSource=AUTH_SOURCE)
     db = client["edgar"]
     collection = db["ciks"]
 
